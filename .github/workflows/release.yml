@@ -92,7 +92,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        image-ref: ${{ env.IMAGE_NAME }}:${{ steps.docker_meta.outputs.version }}
+        image-ref: ${{ steps.repo.outputs.name }}:${{ steps.docker_meta.outputs.version }}
         ignore-unfixed: true
         format: 'template'
         template: '@/contrib/sarif.tpl'
