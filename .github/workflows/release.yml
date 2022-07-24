@@ -8,11 +8,47 @@ on:
 
 jobs:
 
+  check-docker-hub-secrets:
+    name: Check if credentials for Docker Hub are available
+    runs-on: ubuntu-latest
+    outputs:
+      have_secrets: ${{ steps.setvar.outputs.have_secrets }}
+    steps:
+    - id: setvar
+      run: |
+        if [[ "${{ secrets.docker_hub_username }}" != "" && \
+              "${{ secrets.docker_hub_token }}" != "" ]]; \
+        then
+          echo "Secrets to use a container registry were configured in the repo"
+          echo "::set-output name=have_secrets::true"
+        else
+          echo "Secrets to use a container registry were not configured in the repo"
+          echo "::set-output name=have_secrets::false"
+        fi
+
+  check-github-secrets:
+    name: Check if credentials for GitHub are available
+    runs-on: ubuntu-latest
+    outputs:
+      have_secrets: ${{ steps.setvar.outputs.have_secrets }}
+    steps:
+    - id: setvar
+      run: |
+        if [[ "${{ secrets.GITHUB_TOKEN }}" != "" ]]; \
+        then
+          echo "Secrets to use a container registry were configured in the repo"
+          echo "::set-output name=have_secrets::true"
+        else
+          echo "Secrets to use a container registry were not configured in the repo"
+          echo "::set-output name=have_secrets::false"
+        fi
+
   image:
     name: docker-build
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ${{ secrets.docker_hub_username }}/docker-setup
+    needs:
+    - check-github-secrets
+    - check-docker-hub-secrets
     steps:
 
     - name: Checkout
@@ -31,7 +67,7 @@ jobs:
       uses: docker/setup-buildx-action@v2
 
     - name: Login to DockerHub
-      if: secrets.docker_hub_username != "" && secrets.docker_hub_token != ""
+      if: needs.check-docker-hub-secrets.outputs.have_secrets
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.docker_hub_username }}
@@ -43,8 +79,10 @@ jobs:
         context: .
         tags: ${{ steps.docker_meta.outputs.tags }}
         labels: ${{ steps.docker_meta.outputs.labels }}
-        push: github.event_name != 'pull_request' && secrets.docker_hub_username != "" && secrets.docker_hub_token != ""
+        push: github.event_name != 'pull_request' && needs.check-docker-hub-secrets.outputs.have_secrets
+
     - name: Run Trivy vulnerability scanner
+      if: needs.check-github-secrets.outputs.have_secrets
       uses: aquasecurity/trivy-action@0.6.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
