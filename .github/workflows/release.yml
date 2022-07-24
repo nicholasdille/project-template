@@ -95,8 +95,7 @@ jobs:
       with:
         image-ref: ${{ steps.repo.outputs.name }}:${{ steps.docker_meta.outputs.version }}
         ignore-unfixed: true
-        format: 'template'
-        template: '@/contrib/sarif.tpl'
+        format: 'sarif'
         output: 'trivy-results.sarif'
         severity: 'CRITICAL,HIGH'
 
