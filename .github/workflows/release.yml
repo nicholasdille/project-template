@@ -31,7 +31,7 @@ jobs:
       uses: docker/setup-buildx-action@v2
 
     - name: Login to DockerHub
-      if: ${{ secrets.docker_hub_username }} && ${{ secrets.docker_hub_token }}
+      if: secrets.docker_hub_username != "" && secrets.docker_hub_token != ""
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.docker_hub_username }}
@@ -43,8 +43,7 @@ jobs:
         context: .
         tags: ${{ steps.docker_meta.outputs.tags }}
         labels: ${{ steps.docker_meta.outputs.labels }}
-        push: ${{ github.event_name != 'pull_request' }} && ${{ secrets.docker_hub_username }} && ${{ secrets.docker_hub_token }}
-
+        push: github.event_name != 'pull_request' && secrets.docker_hub_username != "" && secrets.docker_hub_token != ""
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.6.0
       env:
