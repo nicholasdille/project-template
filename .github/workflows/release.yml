@@ -84,7 +84,7 @@ jobs:
         context: .
         tags: ${{ steps.docker_meta.outputs.tags }}
         labels: ${{ steps.docker_meta.outputs.labels }}
-        push: github.event_name != 'pull_request' && needs.check-docker-hub-secrets.outputs.have_secrets
+        push: github.event_name != 'pull_request' && needs.check-docker-hub-secrets.outputs.have_secrets == 'true'
 
     - name: Run Trivy vulnerability scanner
       if: needs.check-github-secrets.outputs.have_secrets
