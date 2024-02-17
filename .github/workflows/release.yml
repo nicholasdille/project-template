@@ -116,7 +116,7 @@ jobs:
         output: ${{ steps.repo.outputs.name }}-${{ steps.docker_meta.outputs.version }}.cyclonedx.json
 
     - name: Store SBoM
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: sbom
         path: ${{ steps.repo.outputs.name }}-${{ steps.docker_meta.outputs.version }}.cyclonedx.json
