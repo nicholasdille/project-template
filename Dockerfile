@@ -1,6 +1,6 @@
 #syntax=docker/dockerfile:1.4.3
 
-FROM ubuntu:22.04@sha256:0e5e4a57c2499249aafc3b40fcd541e9a456aab7296681a3994d631587203f97
+FROM ubuntu:26.04@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
 
 # Unattended operations
 ARG DEBIAN_FRONTEND=noninteractive
